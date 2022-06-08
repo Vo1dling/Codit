@@ -1,0 +1,38 @@
+nav,
+.account-buttons {
+  display: flex;
+  background: black;
+  position: sticky;
+  top: 0;
+}
+nav a,
+nav p {
+  margin: 0 1rem;
+  border: 1px solid black;
+  padding: 5px;
+  text-decoration: none;
+  cursor: default;
+  color: rgb(255, 255, 255);
+  background: rgb(42, 0, 196);
+  width: 120px;
+  text-align: center;
+}
+nav a {
+  cursor: pointer;
+}
+nav {
+  width: 100%;
+  padding: 0.5rem 0;
+}
+nav a:hover {
+  background: #666;
+}
+nav a:active {
+  background: #444;
+}
+.account-buttons {
+  margin-left: auto;
+}
+.account-buttons p {
+  color: white;
+}
