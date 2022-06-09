@@ -1,6 +1,3 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
@@ -34,6 +31,7 @@ const userSchema = new mongoose.Schema({
   },
   isManager: {
     type: Boolean,
+    default: false,
   },
   dateOfBirth: {
     type: Date,
@@ -101,5 +99,3 @@ userSchema.pre("save", async function (next) {
 });
 
 const User = mongoose.model("User", userSchema);
-
-module.exports = User;

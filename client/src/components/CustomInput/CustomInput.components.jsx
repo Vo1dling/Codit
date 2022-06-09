@@ -1,39 +1,36 @@
 import React from "react";
 import "./CustomInput.styles.css";
-
-const CustomInput = (props) => {
-  const {
-    type,
-    onChange,
-    placeHolder,
-    inputRef,
-    name,
-    className,
-    required = false,
-  } = props;
-  if (type === "textarea")
-    return (
-      <textarea
-        name={name}
-        id={name}
-        cols="40"
-        rows="20"
-        placeholder={placeHolder}
-        className={className}
-        style={{ resize: "none" }}
-        ref={inputRef}
-      />
-    );
-  else
-    return (
+const CustomInput = ({
+  type,
+  onChange,
+  placeHolder,
+  label,
+  name,
+  inputRef,
+  required,
+  autocomplete,
+  value,
+  checked,
+}) => {
+  return (
+    <div className="input-container">
+      <label htmlFor={name}>
+        {label}
+        {required && <span className="red">*</span>}
+      </label>
       <input
         type={type}
-        onInput={onChange}
+        onChange={onChange}
         placeholder={placeHolder}
+        id={name}
+        onClick={(e) => e.stopPropagation()}
         ref={inputRef}
-        className={className}
         required={required}
+        autoComplete={autocomplete}
+        defaultValue={value}
+        defaultChecked={checked}
       />
-    );
+    </div>
+  );
 };
 export default CustomInput;

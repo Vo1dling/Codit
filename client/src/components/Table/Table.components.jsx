@@ -1,23 +1,15 @@
-import * as React from "react";
-
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Title from "../Title/Title";
-import moment from "moment";
-import CustomButton from "../CustomButton/CustomButton.components";
 import "./Table.styles.css";
 
 function preventDefault(event) {
   event.preventDefault();
 }
 
-export default function UserTable({ data, currentUser }) {
+export default function UserTable({ data, currentUser, setEdit, setUser }) {
   return (
     <React.Fragment>
-      <Title>Registered Users</Title>
+      <Title variant="h6" color="primary">
+        Registered Users
+      </Title>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -39,7 +31,14 @@ export default function UserTable({ data, currentUser }) {
               <TableCell>{user.idNumber}</TableCell>
               <TableCell>{user.isManager ? "Manager" : "Employee"}</TableCell>
               <TableCell>
-                <CustomButton className="button margin" text="Edit" />
+                <CustomButton
+                  className="button margin"
+                  text="Edit"
+                  onClick={() => {
+                    setEdit(true);
+                    setUser(user);
+                  }}
+                />
                 {currentUser._id !== user._id && (
                   <CustomButton className="button" text="Delete" id={user.id} />
                 )}

@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import Header from "./components/Header/Header.components";
 import HomePage from "./pages/HomePage/HomePage.pages";
-import FlashPage from "./pages/FlashCardsPage/FlashCardsPage.pages";
 import CreateEditPage from "./pages/CreateEditPage/CreateEditPage.pages";
-import CharacterPage from "./pages/CharacterPage/CharacterPage.pages";
 import LoginPage from "./pages/LoginPage/LoginPage.pages";
 import SignUpPage from "./pages/SignUpPage/SignUpPage.pages";
 import api from "./components/api/api.js";
@@ -13,9 +10,6 @@ const App = () => {
   const [data, setData] = useState([]);
   const [currentUser, setUser] = useState({});
   const [filteredData, setFilteredData] = useState([]);
-  const [currentDifficulty, setDifficulty] = useState("");
-  const [id, setID] = useState("");
-  const [editing, setEdit] = useState(false);
   const nameInputRef = useRef();
   const emailInputRef = useRef();
   const passInputRef = useRef();
@@ -56,9 +50,6 @@ const App = () => {
         )
       );
   };
-  const setupEdit = (bool) => {
-    setEdit(bool);
-  };
   const onLogin = async () => {
     try {
       const [emailInput, passInput] = [
@@ -81,7 +72,8 @@ const App = () => {
         setUser(res.data.user);
         if (!window.localStorage.getItem("token"))
           window.localStorage.setItem("token", res.data.genToken);
-        api.defaults.headers.common["Authorization"] = res.data.genToken;
+        api.defaults.headers.common["Authorization"] =
+          window.localStorage.getItem("token");
         return res.data.user;
       } else throw new Error();
     } catch (e) {
@@ -130,43 +122,19 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Header setEdit={setupEdit} user={currentUser} logout={logout} />
+      <Header user={currentUser} logout={logout} />
+
       <Route path="/" exact>
         <HomePage data={data} search={search} filteredData={filteredData} />
       </Route>
       <Route path="/create">
         <CreateEditPage
           data={data}
-          editID={id}
-          editing={editing}
-          setEdit={setupEdit}
           getData={getData}
           currentUser={currentUser}
         />
       </Route>
-      <Route path="/flash">
-        <FlashPage
-          data={data}
-          currentDifficulty={currentDifficulty}
-          setDifficulty={setDifficulty}
-        />
-      </Route>
-      {data.length > 0 &&
-        data.map((char) => {
-          return (
-            <Route key={char._id} path={`/${char._id}`} exact>
-              <CharacterPage
-                char={char}
-                getData={getData}
-                editID={id}
-                setID={setID}
-                editing={editing}
-                setEdit={setupEdit}
-                currentUser={currentUser}
-              />
-            </Route>
-          );
-        })}
+
       <Route path="/login">
         <LoginPage
           inputRefs={inputRefs}

@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import "./Header.styles.css";
 const Header = ({ user, logout }) => {
@@ -8,7 +7,6 @@ const Header = ({ user, logout }) => {
       {user.hasOwnProperty("name") && (
         <Link to="/create">Create/Edit Page</Link>
       )}
-      <Link to="/flash">Flash Cards</Link>
       {!user.hasOwnProperty("name") && (
         <div className="account-buttons">
           <Link to="/login">Login</Link>

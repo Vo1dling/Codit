@@ -9,7 +9,7 @@ form {
   width: 40%;
   height: 50vh;
 }
-.input-container {
+.login .input-container {
   display: flex;
   margin-bottom: 2rem;
   flex-direction: column;
@@ -23,13 +23,13 @@ form {
   justify-content: center;
   align-items: center;
 }
-.input-container input {
+.login .input-container input {
   border-radius: 10px;
   width: 25vw;
   font-size: 1.2rem;
   height: 4vh;
 }
-.input-container label {
+.login .input-container label {
   font-size: 1.2rem;
   height: 4vh;
 }
