@@ -22,7 +22,7 @@ const Header = ({ user, setUser, setUserData, setTaskData }) => {
       )}
       {!user.hasOwnProperty("name") && (
         <div className="account-buttons">
-          <Link to="/login">Login</Link>
+          <Link to="/">Login</Link>
         </div>
       )}
       {user.hasOwnProperty("name") && (

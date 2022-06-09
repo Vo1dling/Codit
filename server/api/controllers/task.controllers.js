@@ -35,7 +35,7 @@ const postTask = async (req, res) => {
     );
     await Promise.all(
       addedUsers.map((user) => {
-        if (!user.tasks.includes(newTask._id)) user.tasks.push(newTask._id);
+        if (!user.tasks.includes(req.body._id)) user.tasks.push(req.body._id);
         user.save();
       })
     );
@@ -99,6 +99,7 @@ const editTask = async (req, res) => {
 const editStatus = async (req, res) => {
   try {
     const { status } = req.body;
+    console.log(status);
     if (status !== "Handling" && status !== "Ready")
       return res.status(400).send("Bad Status");
     const user = req.user;

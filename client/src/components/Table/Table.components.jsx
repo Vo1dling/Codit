@@ -24,6 +24,8 @@ export default function CustomTable({
   header,
   title,
   buttonText,
+  updateStatus,
+  setStatus,
 }) {
   const onClickSort = (e) => {
     if (sortingType.type !== e.target.innerText)
@@ -98,24 +100,47 @@ export default function CustomTable({
                 </TableCell>
               ))}
               <TableCell>
-                <CustomButton
-                  className="button margin"
-                  text={buttonText === "Add User" ? "Edit" : "Info"}
-                  onClick={() => {
-                    setEdit(true);
-                    setUser(item);
-                  }}
-                />
-                {currentUser._id !== item._id && (
-                  <CustomButton
-                    className="button"
-                    text="Delete"
-                    id={item.id}
-                    onClick={() => {
-                      setDelete(true);
-                      setUser(item);
-                    }}
-                  />
+                {currentUser.isManager && (
+                  <>
+                    {" "}
+                    <CustomButton
+                      className="button margin"
+                      text={buttonText === "Add User" ? "Edit" : "Info"}
+                      onClick={() => {
+                        setEdit(true);
+                        setUser(item);
+                      }}
+                    />
+                    {currentUser._id !== item._id && (
+                      <CustomButton
+                        className="button"
+                        text="Delete"
+                        id={item.id}
+                        onClick={() => {
+                          setDelete(true);
+                          setUser(item);
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+                {!currentUser.isManager && (
+                  <>
+                    <select
+                      onChange={(e) => {
+                        setStatus(e.target.value);
+                      }}
+                    >
+                      <option hidden>Select a Status</option>
+                      <option value="Handling">Handling</option>
+                      <option value="Ready">Ready</option>
+                    </select>
+                    <CustomButton
+                      text="Update"
+                      onClick={updateStatus}
+                      id={item._id}
+                    />
+                  </>
                 )}
               </TableCell>
             </TableRow>

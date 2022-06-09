@@ -10,6 +10,7 @@ const App = () => {
   const [userData, setUserData] = useState([]);
   const [taskData, setTaskData] = useState([]);
   const [currentUser, setUser] = useState({});
+  const [errorMessage, setError] = useState("");
   const emailInputRef = useRef();
   const passInputRef = useRef();
   const inputRefs = {
@@ -38,6 +39,8 @@ const App = () => {
     if (currentUser.isManager) {
       getUsers();
       getTasks();
+    } else {
+      setTaskData(currentUser.tasks);
     }
     // eslint-disable-next-line
   }, [currentUser]);
@@ -60,6 +63,7 @@ const App = () => {
           token: window.localStorage.getItem("token"),
         });
       }
+
       if (res.status === 200) {
         setUser(res.data.user);
         if (!window.localStorage.getItem("token"))
@@ -69,12 +73,23 @@ const App = () => {
         return res.data.user;
       } else throw new Error();
     } catch (e) {
+      setError("Unable To Login");
+      console.error(e.message);
+    }
+  };
+  const getProfile = async () => {
+    try {
+      const user = await api.get("/users/me");
+      setUser(user.data);
+    } catch (e) {
       console.error(e);
     }
   };
-
   useEffect(() => {
     onLogin();
+  }, []);
+  useEffect(() => {
+    setError("");
   }, []);
 
   return (
@@ -98,7 +113,7 @@ const App = () => {
         <TaskTable
           taskData={taskData}
           userData={userData}
-          getData={getTasks}
+          getData={currentUser.isManager ? getTasks : getProfile}
           currentUser={currentUser}
         />
       </Route>
@@ -108,6 +123,7 @@ const App = () => {
           inputRefs={inputRefs}
           onLogin={onLogin}
           currentUser={currentUser}
+          errorMessage={errorMessage}
           loggedIn={currentUser.hasOwnProperty("name")}
         />
       </Route>

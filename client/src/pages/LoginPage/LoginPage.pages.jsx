@@ -3,7 +3,7 @@ import CustomButton from "../../components/CustomButton/CustomButton.components"
 import "./LoginPage.styles.css";
 import { useHistory } from "react-router-dom";
 
-const LoginPage = ({ inputRefs, onLogin }) => {
+const LoginPage = ({ inputRefs, onLogin, errorMessage }) => {
   const { emailInputRef, passInputRef } = inputRefs;
   const history = useHistory();
   const handleOnFormSubmit = async (e) => {
@@ -17,6 +17,7 @@ const LoginPage = ({ inputRefs, onLogin }) => {
   };
   return (
     <div className="form-container" onSubmit={handleOnFormSubmit}>
+      <p className="red">{errorMessage !== "" && errorMessage}</p>
       <form>
         <div className="input-container">
           <label>Email</label>

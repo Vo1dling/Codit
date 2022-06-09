@@ -16,10 +16,20 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
     type: "off",
     isAsc: true,
   });
+  const [status, setStatus] = useState("Awaiting Response");
   const [searchValue, setSearch] = useState("");
   const [assignResults, setResults] = useState([]);
   const [assignValue, setAssign] = useState("");
-  const { task } = selectedTask;
+  const updateStatus = async (e) => {
+    try {
+      await api.put(`/tasks/status/${e.target.id}`, {
+        status,
+      });
+      getData();
+    } catch (e) {
+      console.error(e);
+    }
+  };
   const onInputChange = (e) => {
     setTask({
       ...selectedTask,
@@ -32,7 +42,7 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
         await api.put(`/tasks/${selectedTask._id}`, selectedTask);
       else await api.post("/tasks", selectedTask);
       getData();
-      setEdit(false);
+      setInfo(false);
     } catch (e) {
       console.error(e);
     }
@@ -57,53 +67,18 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
     return 0;
   };
   const sortData = () => {
-    const arrayCopy = [...taskData];
-    if (sortingType.type === "Task" || sortingType.type === "Role")
-      sortingType.isAsc
-        ? arrayCopy.sort(compare)
-        : arrayCopy.sort(compare).reverse();
-    else if (sortingType.type === "ID Number")
-      sortingType.isAsc
-        ? arrayCopy.sort((a, b) => a.idNumber - b.idNumber)
-        : arrayCopy.sort((a, b) => a.idNumber - b.idNumber).reverse();
+    const arrayCopy = [...(taskData || [])];
+    sortingType.isAsc
+      ? arrayCopy.sort(compare)
+      : arrayCopy.sort(compare).reverse();
     setTableData(arrayCopy);
   };
-  useEffect(() => {
-    // eslint-disable-next-line
-    sortData();
-  }, [taskData, sortingType]);
-  useEffect(() => {
-    if (searchValue !== "")
-      setTableData(
-        filteredTableData.filter((task) =>
-          task.task.toLowerCase().includes(searchValue.toLowerCase())
-        )
-      );
-    else {
-      setTableData(taskData);
-      sortData();
-    }
-  }, [searchValue]);
   const search = (e) => {
     setSearch(e.target.value);
   };
   const assign = (e) => {
     setAssign(e.target.value);
   };
-  useEffect(() => {
-    if (selectedTask.hasOwnProperty("assignedEmployees")) {
-      const idList = selectedTask.assignedEmployees.map(
-        (employee) => employee.employee._id
-      );
-      setResults(
-        userData
-          .filter((user) =>
-            user.name.toLowerCase().includes(assignValue.toLowerCase())
-          )
-          .filter((user) => !idList.includes(user._id))
-      );
-    }
-  }, [assignValue]);
   const header = [
     { label: "Task", prop: "task", isSortable: true },
     { label: "Status", prop: "status", isSortable: false },
@@ -120,12 +95,48 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
     setTask({
       ...selectedTask,
       assignedEmployees: [
-        ...selectedTask.assignedEmployees,
+        ...(selectedTask.assignedEmployees || []),
         { employee, employeeStatus: "Awaiting Response" },
       ],
     });
     setAssign("");
   };
+  useEffect(() => {
+    if (selectedTask.hasOwnProperty("assignedEmployees")) {
+      const idList = selectedTask.assignedEmployees.map(
+        (employee) => employee.employee._id
+      );
+      setResults(
+        userData
+          .filter((user) =>
+            user.name.toLowerCase().includes(assignValue.toLowerCase())
+          )
+          .filter((user) => !idList.includes(user._id))
+          .filter((user) => !user.isManager)
+      );
+    } else {
+      setResults(userData);
+    }
+  }, [assignValue]);
+  useEffect(() => {
+    // eslint-disable-next-line
+    sortData();
+  }, [taskData, sortingType]);
+  useEffect(() => {
+    if (searchValue !== "")
+      setTableData(
+        filteredTableData.filter((task) =>
+          task.task.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
+    else {
+      setTableData(taskData);
+      sortData();
+    }
+  }, [searchValue]);
+  useEffect(() => {
+    getData();
+  }, [currentUser.name]);
   const unassignEmployee = (employee) => {
     setTask({
       ...selectedTask,
@@ -146,6 +157,8 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
         setUser={setTask}
         setDelete={setDelete}
         search={search}
+        updateStatus={updateStatus}
+        setStatus={setStatus}
         searchValue={searchValue}
         header={header}
         title={"Registered Tasks"}
@@ -168,33 +181,44 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
           </div>
         </PopupWindow>
       )}
-      {showInfo &&
-        selectedTask.hasOwnProperty("assignedEmployees") &&
-        selectedTask._id && (
-          <PopupWindow title="View Task" titleSize="h5">
-            <h3>Task:{selectedTask.task}</h3>
-            <div className="results-container">
-              <CustomInput
-                placeHolder="Enter Employee name..."
-                label="Add Employee"
-                value={assignValue}
-                onChange={assign}
-              />
-              {assignValue !== "" && (
-                <div className="results-view">
-                  {assignResults.map((result) => (
-                    <CustomButton
-                      text={result.name}
-                      onClick={() => {
-                        assignEmployee(result);
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="employee-container">
-              {selectedTask.assignedEmployees.map((employee) => (
+      {showInfo && (
+        <PopupWindow
+          title={selectedTask._id ? "View Task" : "Add Task"}
+          titleSize="h5"
+        >
+          <h3>
+            Task:{" "}
+            <CustomInput
+              value={selectedTask.task}
+              placeHolder="Task Name"
+              onChange={(e) => {
+                setTask({ ...selectedTask, task: e.target.value });
+              }}
+            />
+          </h3>
+          <div className="results-container">
+            <CustomInput
+              placeHolder="Enter Employee name..."
+              label="Add Employee"
+              value={assignValue}
+              onChange={assign}
+            />
+            {assignValue !== "" && (
+              <div className="results-view">
+                {assignResults.map((result) => (
+                  <CustomButton
+                    text={result.name}
+                    onClick={() => {
+                      assignEmployee(result);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="employee-container">
+            {selectedTask.hasOwnProperty("assignedEmployees") &&
+              selectedTask.assignedEmployees.map((employee) => (
                 <div className="employee-card">
                   <p>{employee.employee.name}</p>
                   <p>{employee.employeeStatus}</p>
@@ -208,19 +232,19 @@ const TaskTable = ({ taskData, currentUser, getData, userData }) => {
                   />
                 </div>
               ))}
-            </div>
-            <div className="btn-container">
-              <CustomButton
-                text="Cancel"
-                onClick={() => {
-                  setInfo(false);
-                  setTask({});
-                }}
-              />
-              <CustomButton text="Save" onClick={editTask} />
-            </div>
-          </PopupWindow>
-        )}
+          </div>
+          <div className="btn-container">
+            <CustomButton
+              text="Cancel"
+              onClick={() => {
+                setInfo(false);
+                setTask({});
+              }}
+            />
+            <CustomButton text="Save" onClick={editTask} />
+          </div>
+        </PopupWindow>
+      )}
     </div>
   );
 };

@@ -1,13 +1,13 @@
 const express = require("express");
 const {
-	postUser,
-	login,
-	logout,
-	logoutAll,
-
-	getUsers,
-	updateUser,
-	deleteUser,
+  postUser,
+  login,
+  logout,
+  logoutAll,
+  viewProfile,
+  getUsers,
+  updateUser,
+  deleteUser,
 } = require("../controllers/user.controllers");
 const authenticate = require("../../middleware/authenticate");
 const authorize = require("../../middleware/authorize");
@@ -18,6 +18,7 @@ router.post("/users", [authenticate, authorize], postUser);
 router.post("/users/login", login);
 
 router.post("/users/logout", authenticate, logout);
+router.get("/users/me", [authenticate], viewProfile);
 
 router.post("/users/logoutAll", authenticate, logoutAll);
 
