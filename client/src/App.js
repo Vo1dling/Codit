@@ -37,9 +37,9 @@ const App = () => {
   };
 
   useEffect(() => {
-    getData();
+    if (currentUser.isManager) getData();
     // eslint-disable-next-line
-  }, [filteredData]);
+  }, [currentUser]);
 
   const search = (e) => {
     if (e.target.value === "") setFilteredData([]);

@@ -4,7 +4,13 @@ function preventDefault(event) {
   event.preventDefault();
 }
 
-export default function UserTable({ data, currentUser, setEdit, setUser }) {
+export default function UserTable({
+  data,
+  currentUser,
+  setEdit,
+  setUser,
+  setDelete,
+}) {
   return (
     <React.Fragment>
       <Title variant="h6" color="primary">
@@ -18,6 +24,7 @@ export default function UserTable({ data, currentUser, setEdit, setUser }) {
             <TableCell>Date Of Birth</TableCell>
             <TableCell>ID Number</TableCell>
             <TableCell>Role</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -40,7 +47,15 @@ export default function UserTable({ data, currentUser, setEdit, setUser }) {
                   }}
                 />
                 {currentUser._id !== user._id && (
-                  <CustomButton className="button" text="Delete" id={user.id} />
+                  <CustomButton
+                    className="button"
+                    text="Delete"
+                    id={user.id}
+                    onClick={() => {
+                      setDelete(true);
+                      setUser(user);
+                    }}
+                  />
                 )}
               </TableCell>
             </TableRow>

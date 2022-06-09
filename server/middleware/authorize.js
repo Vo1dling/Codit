@@ -1,8 +1,7 @@
-const User = require("../models/user");
-
 const authorize = async (req, res, next) => {
   try {
-    if (req.user.isManager === false || null) {
+    console.log(req.user);
+    if (req.user.isManager === false) {
       throw new Error();
     } else {
       res.status(200);

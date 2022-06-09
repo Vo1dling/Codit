@@ -11,6 +11,7 @@ const CustomInput = ({
   autocomplete,
   value,
   checked,
+  prop,
 }) => {
   return (
     <div className="input-container">
@@ -29,6 +30,7 @@ const CustomInput = ({
         autoComplete={autocomplete}
         defaultValue={value}
         defaultChecked={checked}
+        data-prop={prop}
       />
     </div>
   );

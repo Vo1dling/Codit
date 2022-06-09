@@ -13,8 +13,8 @@ const taskRouter = express.Router();
 
 taskRouter.get("/tasks", getAllTasks);
 taskRouter.get("/tasks/:id", getTask);
-taskRouter.post("/tasks", authenticate, authorize, postTask);
-taskRouter.put("/tasks/:id", authenticate, authorize, editTask);
-taskRouter.delete("/tasks/:id", authenticate, authorize, deleteTask);
+taskRouter.post("/tasks", [authenticate, authorize], postTask);
+taskRouter.put("/tasks/:id", [authenticate, authorize], editTask);
+taskRouter.delete("/tasks/:id", [authenticate, authorize], deleteTask);
 
 module.exports = taskRouter;

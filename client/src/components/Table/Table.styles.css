@@ -1,5 +1,5 @@
 button {
-  width: 45%;
+  width: 100%;
   height: 4vh;
   border-radius: 10px;
   background-color: black;
@@ -10,5 +10,5 @@ button:hover {
   background-color: rgb(42, 0, 196);
 }
 .margin {
-  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
 }

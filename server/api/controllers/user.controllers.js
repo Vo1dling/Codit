@@ -31,7 +31,7 @@ const login = async (req, res) => {
     const genToken = await user.generateAuthToken();
     res.send({ user, genToken });
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send(e.message);
   }
 };
 const logout = async (req, res) => {
@@ -89,14 +89,6 @@ const getUsers = async (req, res) => {
 };
 const updateUser = async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "age"];
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
-
-  if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid updates!" });
-  }
 
   try {
     const user = await User.findById(req.params.id);

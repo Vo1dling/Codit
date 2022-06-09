@@ -14,7 +14,7 @@ const authenticate = require("../../middleware/authenticate");
 const authorize = require("../../middleware/authorize");
 const router = new express.Router();
 
-router.post("/users", postUser);
+router.post("/users", [authenticate, authorize], postUser);
 
 router.post("/users/login", login);
 
@@ -22,14 +22,10 @@ router.post("/users/logout", authenticate, logout);
 
 router.post("/users/logoutAll", authenticate, logoutAll);
 
-router.get("/users/me", authenticate, viewProfile);
+router.get("/users/", [authenticate, authorize], getUsers);
 
-router.get("/users/:id", getUser);
+router.put("/users/:id", [authenticate, authorize], updateUser);
 
-router.get("/users/", getUsers);
-
-router.put("/users/:id", authenticate, updateUser);
-
-router.delete("/users/:id", authenticate, deleteUser);
+router.delete("/users/:id", [authenticate, authorize], deleteUser);
 
 module.exports = router;
