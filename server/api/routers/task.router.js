@@ -1,20 +1,22 @@
 const express = require("express");
 const {
-  getAllTasks,
-  getTask,
-  postTask,
-  editTask,
-  deleteTask,
+	getAllTasks,
+	postTask,
+	editTask,
+	deleteTask,
+	assignEmployee,
+	editStatus,
 } = require("../controllers/task.controllers");
 const authorize = require("../../middleware/authorize");
 const authenticate = require("../../middleware/authenticate");
 
 const taskRouter = express.Router();
 
-taskRouter.get("/tasks", getAllTasks);
-taskRouter.get("/tasks/:id", getTask);
+taskRouter.get("/tasks", [authenticate, authorize], getAllTasks);
 taskRouter.post("/tasks", [authenticate, authorize], postTask);
+taskRouter.put("/tasks/assign", [authenticate, authorize], assignEmployee);
 taskRouter.put("/tasks/:id", [authenticate, authorize], editTask);
+taskRouter.put("/tasks/status/:id", [authenticate], editStatus);
 taskRouter.delete("/tasks/:id", [authenticate, authorize], deleteTask);
 
 module.exports = taskRouter;

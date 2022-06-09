@@ -1,14 +1,13 @@
 const express = require("express");
 const {
-  postUser,
-  login,
-  logout,
-  logoutAll,
-  viewProfile,
-  getUser,
-  getUsers,
-  updateUser,
-  deleteUser,
+	postUser,
+	login,
+	logout,
+	logoutAll,
+
+	getUsers,
+	updateUser,
+	deleteUser,
 } = require("../controllers/user.controllers");
 const authenticate = require("../../middleware/authenticate");
 const authorize = require("../../middleware/authorize");
