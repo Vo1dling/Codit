@@ -11,10 +11,7 @@ import CustomButton from "../CustomButton/CustomButton.components";
 import "./Table.styles.css";
 import CustomInput from "../CustomInput/CustomInput.components";
 
-function preventDefault(event) {
-  event.preventDefault();
-}
-export default function UserTable({
+export default function CustomTable({
   data,
   currentUser,
   setEdit,
@@ -25,6 +22,8 @@ export default function UserTable({
   search,
   searchValue,
   header,
+  title,
+  buttonText,
 }) {
   const onClickSort = (e) => {
     if (sortingType.type !== e.target.innerText)
@@ -37,7 +36,7 @@ export default function UserTable({
   return (
     <React.Fragment>
       <Title variant="h6" color="primary">
-        Registered Users
+        {title}
       </Title>
       <CustomInput label="Search" onChange={search} value={searchValue} />
       <Table size="small">
@@ -101,7 +100,7 @@ export default function UserTable({
               <TableCell>
                 <CustomButton
                   className="button margin"
-                  text="Edit"
+                  text={buttonText === "Add User" ? "Edit" : "Info"}
                   onClick={() => {
                     setEdit(true);
                     setUser(item);
@@ -122,12 +121,14 @@ export default function UserTable({
             </TableRow>
           ))}
           <TableRow>
-            <CustomButton
-              text="Add User"
-              onClick={() => {
-                setEdit(true);
-              }}
-            />
+            {currentUser.isManager === true && (
+              <CustomButton
+                text={buttonText}
+                onClick={() => {
+                  setEdit(true);
+                }}
+              />
+            )}
           </TableRow>
         </TableBody>
       </Table>

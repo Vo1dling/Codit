@@ -17,17 +17,18 @@ const Header = ({ user, setUser, setUserData, setTaskData }) => {
   return (
     <nav>
       {user.hasOwnProperty("name") && <Link to="/taskTable">Tasks Table</Link>}
-      {user.hasOwnProperty("name") && <Link to="/userTable">Users Table</Link>}
+      {user.hasOwnProperty("name") && user.isManager === true && (
+        <Link to="/userTable">Users Table</Link>
+      )}
       {!user.hasOwnProperty("name") && (
         <div className="account-buttons">
           <Link to="/login">Login</Link>
-          <Link to="/signup">Sign Up</Link>
         </div>
       )}
       {user.hasOwnProperty("name") && (
         <div className="account-buttons">
           <p className="user">Welcome {user.name}</p>
-          <Link onClick={logout} to="/login">
+          <Link onClick={logout} to="/">
             Logout
           </Link>
         </div>

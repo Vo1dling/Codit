@@ -28,7 +28,17 @@ const getAllTasks = async (req, res) => {
 const postTask = async (req, res) => {
   try {
     const task = await addTask({ ...req.body, taskCreator: req.user._id });
-
+    const addedUsers = await Promise.all(
+      req.body.assignedEmployees.map((employee) =>
+        User.findById(employee.employee._id)
+      )
+    );
+    await Promise.all(
+      addedUsers.map((user) => {
+        if (!user.tasks.includes(newTask._id)) user.tasks.push(newTask._id);
+        user.save();
+      })
+    );
     await task.save();
     res.status(201).send(task);
   } catch (e) {
@@ -41,37 +51,51 @@ const postTask = async (req, res) => {
 const editTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const task = await Task.findById(id);
-    if (!task) throw createCustomError("Task not found", 404, "editTask Error");
+    const oldTask = await Task.findById(id);
+    if (!oldTask)
+      throw createCustomError("Task not found", 404, "editTask Error");
     const newTask = req.body;
+    const removedEmployees = oldTask.assignedEmployees.filter(
+      (employee) =>
+        !newTask.assignedEmployees.find(
+          (newEmployee) => newEmployee.employee._id == employee.employee
+        )
+    );
+    const removedUsers = await Promise.all(
+      removedEmployees.map((employee) => User.findById(employee.employee))
+    );
+    await Promise.all(
+      removedUsers.map((user) => {
+        user.tasks = user.tasks.filter((task) => !task.equals(newTask._id));
+        user.save();
+      })
+    );
+    const addedEmployees = newTask.assignedEmployees.filter(
+      (employee) =>
+        !oldTask.assignedEmployees.find(
+          (oldEmployee) => oldEmployee.employee == employee.employee._id
+        )
+    );
+    const addedUsers = await Promise.all(
+      addedEmployees.map((employee) => User.findById(employee.employee._id))
+    );
+    await Promise.all(
+      addedUsers.map((user) => {
+        if (!user.tasks.includes(newTask._id)) user.tasks.push(newTask._id);
+        user.save();
+      })
+    );
     for (const prop in newTask) {
-      task[prop] = newTask[prop];
+      oldTask[prop] = newTask[prop];
     }
-    await task.save();
-    res.send(task);
+
+    await oldTask.save();
+    res.send(oldTask);
   } catch (e) {
     res.status(500).send(e.message);
   }
 };
-const assignEmployee = async (req, res) => {
-  try {
-    const { taskID, employeeID } = req.body;
-    const task = await Task.findById(taskID);
-    const user = await User.findById(employeeID);
-    if (!user) return res.status(404).send("User not Found!");
-    if (!task) return res.status(404).send("Task not Found!");
-    if (!task.assignedEmployees.includes(employeeID)) {
-      task.assignedEmployees.push({ employee: employeeID });
-      user.tasks.push(taskID);
-      await user.save();
-    } else
-      return res.status(400).send("Employee Already Assigned to this Task!");
-    await task.save();
-    res.send("Assigned Employee");
-  } catch (e) {
-    res.status(500).send(e.message);
-  }
-};
+
 const editStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -140,6 +164,5 @@ module.exports = {
   getAllTasks,
   postTask,
   deleteTask,
-  assignEmployee,
   editStatus,
 };

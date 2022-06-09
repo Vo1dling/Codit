@@ -6,7 +6,7 @@ import CustomInput from "../../components/CustomInput/CustomInput.components";
 import CustomButton from "../../components/CustomButton/CustomButton.components";
 import moment from "moment";
 import api from "../../components/api/api";
-const CreatePage = ({ data, currentUser, getData }) => {
+const UserTable = ({ data, currentUser, getData }) => {
   const [filteredData, setData] = useState([]);
   const [isEdit, setEdit] = useState(false);
   const [showDelete, setDelete] = useState(false);
@@ -105,6 +105,8 @@ const CreatePage = ({ data, currentUser, getData }) => {
         search={search}
         searchValue={searchValue}
         header={header}
+        title={"Registered Users"}
+        buttonText={"Add User"}
       />
       {isEdit && (
         <PopupWindow
@@ -194,4 +196,4 @@ const CreatePage = ({ data, currentUser, getData }) => {
     </div>
   );
 };
-export default CreatePage;
+export default UserTable;

@@ -98,12 +98,12 @@ const App = () => {
         <TaskTable
           taskData={taskData}
           userData={userData}
-          getData={getUsers}
+          getData={getTasks}
           currentUser={currentUser}
         />
       </Route>
 
-      <Route path="/login">
+      <Route exact path="/">
         <LoginPage
           inputRefs={inputRefs}
           onLogin={onLogin}

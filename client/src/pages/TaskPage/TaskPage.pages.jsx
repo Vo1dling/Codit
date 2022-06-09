@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import PopupWindow from "../../components/PopupWindow/PopupWindow.components";
 import CustomInput from "../../components/CustomInput/CustomInput.components";
 import CustomButton from "../../components/CustomButton/CustomButton.components";
-import moment from "moment";
+
 import api from "../../components/api/api";
-const CreatePage = ({ taskData, currentUser, getData, userData }) => {
-  const [filteredData, setData] = useState([]);
+const TaskTable = ({ taskData, currentUser, getData, userData }) => {
+  const [filteredTableData, setTableData] = useState([]);
   const [isEdit, setEdit] = useState(false);
+  const [showInfo, setInfo] = useState(false);
   const [showDelete, setDelete] = useState(false);
   const [selectedTask, setTask] = useState({});
   const [sortingType, setSort] = useState({
@@ -16,7 +17,9 @@ const CreatePage = ({ taskData, currentUser, getData, userData }) => {
     isAsc: true,
   });
   const [searchValue, setSearch] = useState("");
-  const { task, assignedEmployees } = selectedTask;
+  const [assignResults, setResults] = useState([]);
+  const [assignValue, setAssign] = useState("");
+  const { task } = selectedTask;
   const onInputChange = (e) => {
     setTask({
       ...selectedTask,
@@ -26,7 +29,7 @@ const CreatePage = ({ taskData, currentUser, getData, userData }) => {
   const editTask = async () => {
     try {
       if (selectedTask._id)
-        await api.put(`/Task/${selectedTask._id}`, selectedTask);
+        await api.put(`/tasks/${selectedTask._id}`, selectedTask);
       else await api.post("/tasks", selectedTask);
       getData();
       setEdit(false);
@@ -63,26 +66,44 @@ const CreatePage = ({ taskData, currentUser, getData, userData }) => {
       sortingType.isAsc
         ? arrayCopy.sort((a, b) => a.idNumber - b.idNumber)
         : arrayCopy.sort((a, b) => a.idNumber - b.idNumber).reverse();
-    setData(arrayCopy);
+    setTableData(arrayCopy);
   };
   useEffect(() => {
+    // eslint-disable-next-line
     sortData();
   }, [taskData, sortingType]);
   useEffect(() => {
     if (searchValue !== "")
-      setData(
-        filteredData.filter((user) =>
-          user.name.toLowerCase().includes(searchValue.toLowerCase())
+      setTableData(
+        filteredTableData.filter((task) =>
+          task.task.toLowerCase().includes(searchValue.toLowerCase())
         )
       );
     else {
-      setData(taskData);
+      setTableData(taskData);
       sortData();
     }
   }, [searchValue]);
   const search = (e) => {
     setSearch(e.target.value);
   };
+  const assign = (e) => {
+    setAssign(e.target.value);
+  };
+  useEffect(() => {
+    if (selectedTask.hasOwnProperty("assignedEmployees")) {
+      const idList = selectedTask.assignedEmployees.map(
+        (employee) => employee.employee._id
+      );
+      setResults(
+        userData
+          .filter((user) =>
+            user.name.toLowerCase().includes(assignValue.toLowerCase())
+          )
+          .filter((user) => !idList.includes(user._id))
+      );
+    }
+  }, [assignValue]);
   const header = [
     { label: "Task", prop: "task", isSortable: true },
     { label: "Status", prop: "status", isSortable: false },
@@ -95,65 +116,45 @@ const CreatePage = ({ taskData, currentUser, getData, userData }) => {
     { label: "Started At", prop: "startedAt", isSortable: false },
     { label: "Finished At", prop: "finishedAt", isSortable: false },
   ];
-
+  const assignEmployee = (employee) => {
+    setTask({
+      ...selectedTask,
+      assignedEmployees: [
+        ...selectedTask.assignedEmployees,
+        { employee, employeeStatus: "Awaiting Response" },
+      ],
+    });
+    setAssign("");
+  };
+  const unassignEmployee = (employee) => {
+    setTask({
+      ...selectedTask,
+      assignedEmployees: selectedTask.assignedEmployees.filter(
+        (tempEmployee) => tempEmployee.employee._id !== employee.employee._id
+      ),
+    });
+    setAssign("");
+  };
   return (
     <div className="userTable-page">
       <Table
-        data={filteredData}
+        data={filteredTableData}
         sortingType={sortingType}
         setSort={setSort}
         currentUser={currentUser}
-        setEdit={setEdit}
+        setEdit={setInfo}
         setUser={setTask}
         setDelete={setDelete}
         search={search}
         searchValue={searchValue}
         header={header}
+        title={"Registered Tasks"}
+        buttonText={"Add Task"}
       />
-      {isEdit && (
-        <PopupWindow
-          title={selectedTask._id ? "Edit Task" : "Add Task"}
-          titleSize="h4"
-        >
-          <div className="inputs-container">
-            <CustomInput
-              label="Task"
-              placeHolder="Enter Task..."
-              required
-              value={task}
-              onChange={onInputChange}
-              prop="task"
-            />
-            <label for="assignedEmployees">Choose a User:</label>
-            <select name="assign" id="assign">
-              {userData.map((user) => (
-                <option value={user.name}>{user.name}</option>
-              ))}
-            </select>
-            <CustomInput
-              label="Assigned Employees"
-              placeHolder="Assign an Employee('s)..."
-              type="select"
-              value={assignedEmployees}
-              onChange={onInputChange}
-              prop="assignedEmployees"
-            ></CustomInput>
-          </div>
-          <div className="btn-container">
-            <CustomButton
-              text="Cancel"
-              onClick={() => {
-                setEdit(false);
-                setTask({});
-              }}
-            />
-            <CustomButton text="Save" onClick={editTask} />
-          </div>
-        </PopupWindow>
-      )}
+
       {showDelete && (
         <PopupWindow
-          title={`Are you sure you want to delete ${selectedTask.Task}`}
+          title={`Are you sure you want to delete ${selectedTask.task}`}
           titleSize="h5"
         >
           <div className="btn-container">
@@ -167,7 +168,60 @@ const CreatePage = ({ taskData, currentUser, getData, userData }) => {
           </div>
         </PopupWindow>
       )}
+      {showInfo &&
+        selectedTask.hasOwnProperty("assignedEmployees") &&
+        selectedTask._id && (
+          <PopupWindow title="View Task" titleSize="h5">
+            <h3>Task:{selectedTask.task}</h3>
+            <div className="results-container">
+              <CustomInput
+                placeHolder="Enter Employee name..."
+                label="Add Employee"
+                value={assignValue}
+                onChange={assign}
+              />
+              {assignValue !== "" && (
+                <div className="results-view">
+                  {assignResults.map((result) => (
+                    <CustomButton
+                      text={result.name}
+                      onClick={() => {
+                        assignEmployee(result);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="employee-container">
+              {selectedTask.assignedEmployees.map((employee) => (
+                <div className="employee-card">
+                  <p>{employee.employee.name}</p>
+                  <p>{employee.employeeStatus}</p>
+                  <p>{employee.startedAt}</p>
+                  <p>{employee.finishedAt}</p>
+                  <CustomButton
+                    text="Remove"
+                    onClick={() => {
+                      unassignEmployee(employee);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="btn-container">
+              <CustomButton
+                text="Cancel"
+                onClick={() => {
+                  setInfo(false);
+                  setTask({});
+                }}
+              />
+              <CustomButton text="Save" onClick={editTask} />
+            </div>
+          </PopupWindow>
+        )}
     </div>
   );
 };
-export default CreatePage;
+export default TaskTable;
