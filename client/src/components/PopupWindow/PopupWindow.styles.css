@@ -1,37 +1,39 @@
 .edit-window {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  backdrop-filter: blur(2px);
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	backdrop-filter: blur(2px);
+	top: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 }
 .window {
-  width: 50%;
-  padding: 2rem;
-  background-color: gray;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+	width: 50%;
+	padding: 2rem;
+	background-color: gray;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
 }
 .window button {
-  width: 30%;
-  margin: 0 1rem;
+	width: 30%;
+	margin: 0 1rem;
 }
 .inputs-container {
-  display: grid;
-  width: 100%;
-  justify-content: center;
-  gap: 1rem;
+	display: grid;
+	width: 100%;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	justify-items: center;
+	justify-content: center;
+	gap: 1rem;
 }
 .btn-container {
-  margin-top: 1rem;
-  width: 100%;
+	margin-top: 1rem;
+	width: 100%;
 
-  display: flex;
-  justify-content: center;
+	display: flex;
+	justify-content: center;
 }
