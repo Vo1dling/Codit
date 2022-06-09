@@ -12,3 +12,15 @@ button:hover {
 .margin {
   margin-bottom: 0.5rem;
 }
+.sortable {
+  cursor: pointer;
+  color: aqua;
+  margin-right: 0.25rem;
+}
+.sortable ~ i {
+  color: aqua;
+}
+.sortable:hover,
+.sortable:hover ~ i {
+  color: rgb(0, 233, 233);
+}

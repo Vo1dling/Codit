@@ -1,15 +1,20 @@
 import "./CreateEditPage.styles.css";
 import Table from "../../components/Table/Table.components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PopupWindow from "../../components/PopupWindow/PopupWindow.components";
 import CustomInput from "../../components/CustomInput/CustomInput.components";
 import CustomButton from "../../components/CustomButton/CustomButton.components";
 import moment from "moment";
 import api from "../../components/api/api";
 const CreatePage = ({ data, currentUser, getData }) => {
+  const [filteredData, setData] = useState([]);
   const [isEdit, setEdit] = useState(false);
   const [showDelete, setDelete] = useState(false);
   const [selectedUser, setUser] = useState({});
+  const [sortingType, setSort] = useState({
+    type: "off",
+    isAsc: true,
+  });
   const { name, email, password, dateOfBirth, idNumber, isManager } =
     selectedUser;
   const onInputChange = (e) => {
@@ -20,13 +25,28 @@ const CreatePage = ({ data, currentUser, getData }) => {
   };
   const editUser = async () => {
     try {
-      await api.put(`/users/${selectedUser._id}`, selectedUser);
+      if (selectedUser._id)
+        await api.put(`/users/${selectedUser._id}`, selectedUser);
+      else await api.post("/users", selectedUser);
       getData();
       setEdit(false);
     } catch (e) {
       console.error(e);
     }
   };
+  const sortData = () => {
+    const arrayCopy = [...data];
+    if (sortingType.type === "Name" || sortingType.type === "Role")
+      sortingType.isAsc ? arrayCopy.sort().reverse() : arrayCopy.sort();
+    else if (sortingType.type === "ID Number")
+      sortingType.isAsc
+        ? arrayCopy.sort((a, b) => a - b).reverse()
+        : arrayCopy.sort((a, b) => a - b);
+    setData(arrayCopy);
+  };
+  useEffect(() => {
+    sortData();
+  }, [data, sortingType]);
   const deleteUser = async () => {
     try {
       await api.delete(`/users/${selectedUser._id}`);
@@ -39,7 +59,10 @@ const CreatePage = ({ data, currentUser, getData }) => {
   return (
     <div className="create-page">
       {isEdit && (
-        <PopupWindow title="Edit User" titleSize="h4">
+        <PopupWindow
+          title={selectedUser._id ? "Edit User" : "Add User"}
+          titleSize="h4"
+        >
           <div className="inputs-container">
             <CustomInput
               label="Name"
@@ -70,7 +93,7 @@ const CreatePage = ({ data, currentUser, getData }) => {
               label="Date of Birth"
               type="date"
               required
-              value={moment(dateOfBirth).format("yyyy-MM-DD")}
+              value={moment(dateOfBirth || "").format("yyyy-MM-DD")}
               onChange={onInputChange}
               prop="dateOfBirth"
             />
@@ -97,6 +120,7 @@ const CreatePage = ({ data, currentUser, getData }) => {
               text="Cancel"
               onClick={() => {
                 setEdit(false);
+                setUser({});
               }}
             />
             <CustomButton text="Save" onClick={editUser} />
@@ -120,7 +144,9 @@ const CreatePage = ({ data, currentUser, getData }) => {
         </PopupWindow>
       )}
       <Table
-        data={data}
+        data={filteredData}
+        sortingType={sortingType}
+        setSort={setSort}
         currentUser={currentUser}
         setEdit={setEdit}
         setUser={setUser}

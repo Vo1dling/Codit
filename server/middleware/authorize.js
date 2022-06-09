@@ -1,6 +1,5 @@
 const authorize = async (req, res, next) => {
   try {
-    console.log(req.user);
     if (req.user.isManager === false) {
       throw new Error();
     } else {

@@ -1,16 +1,35 @@
+import * as React from "react";
+
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Title from "../Title/Title";
+import moment from "moment";
+import CustomButton from "../CustomButton/CustomButton.components";
 import "./Table.styles.css";
 
 function preventDefault(event) {
   event.preventDefault();
 }
-
 export default function UserTable({
   data,
   currentUser,
   setEdit,
   setUser,
   setDelete,
+  sortingType,
+  setSort,
 }) {
+  const onClickSort = (e) => {
+    if (sortingType.type !== e.target.innerText)
+      setSort({ type: e.target.innerText, isAsc: true });
+    else {
+      if (sortingType.isAsc) setSort({ type: sortingType.type, isAsc: false });
+      else setSort({ type: "off", isAsc: true });
+    }
+  };
   return (
     <React.Fragment>
       <Title variant="h6" color="primary">
@@ -19,11 +38,44 @@ export default function UserTable({
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
+            <TableCell>
+              <span className="sortable" onClick={onClickSort}>
+                Name
+              </span>
+              {sortingType.type === "Name" && (
+                <i
+                  class={
+                    sortingType.isAsc ? "fas fa-arrow-up" : "fas fa-arrow-down"
+                  }
+                ></i>
+              )}
+            </TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Date Of Birth</TableCell>
-            <TableCell>ID Number</TableCell>
-            <TableCell>Role</TableCell>
+            <TableCell>
+              <span className="sortable" onClick={onClickSort}>
+                ID Number
+              </span>
+              {sortingType.type === "ID Number" && (
+                <i
+                  class={
+                    sortingType.isAsc ? "fas fa-arrow-up" : "fas fa-arrow-down"
+                  }
+                ></i>
+              )}
+            </TableCell>
+            <TableCell>
+              <span className="sortable" onClick={onClickSort}>
+                Role
+              </span>
+              {sortingType.type === "Role" && (
+                <i
+                  class={
+                    sortingType.isAsc ? "fas fa-arrow-up" : "fas fa-arrow-down"
+                  }
+                ></i>
+              )}
+            </TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -60,6 +112,14 @@ export default function UserTable({
               </TableCell>
             </TableRow>
           ))}
+          <TableRow>
+            <CustomButton
+              text="Add User"
+              onClick={() => {
+                setEdit(true);
+              }}
+            />
+          </TableRow>
         </TableBody>
       </Table>
     </React.Fragment>
