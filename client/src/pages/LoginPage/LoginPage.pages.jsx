@@ -10,7 +10,7 @@ const LoginPage = ({ inputRefs, onLogin }) => {
     try {
       e.preventDefault();
       const user = await onLogin();
-      if (user.hasOwnProperty("name")) history.push("/");
+      if (user.hasOwnProperty("name")) history.push("/userTable");
     } catch (e) {
       console.log(e);
     }

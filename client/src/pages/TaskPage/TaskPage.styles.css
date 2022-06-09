@@ -5,7 +5,7 @@
 body::-webkit-scrollbar {
   display: none;
 }
-.create-page {
+.userTable-page {
   background-color: rgb(180, 180, 180);
   border: 5px black solid;
   width: 99.4%;
@@ -39,7 +39,7 @@ body::-webkit-scrollbar {
   width: 90%;
   height: 7.5%;
 }
-.create-page .card-container {
+.userTable-page .card-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
